@@ -2,6 +2,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -74,6 +75,24 @@ class RecordHelperTest {
     }
 
     @Test
+    @DisplayName("正常系: nullに変更できること")
+    void testWithNullChanges() {
+        User updated = RecordHelper.with(
+                original,
+                new HashMap<>() {{
+                    put("name", null);
+                    put("backgroundList", null);
+                }}
+        );
+
+        assertNotNull(updated);
+        assertNull(updated.name());
+        assertEquals(original.age, updated.age());
+        assertNull(updated.backgroundList());
+        assertNotSame(original, updated);
+    }
+
+    @Test
     @DisplayName("準正常系: 元のRecordがnullの場合はnullを返すこと")
     void testWithNullRecord() {
         User updated = RecordHelper.with(null, Map.of("age", 30));
@@ -117,6 +136,21 @@ class RecordHelperTest {
             RecordHelper.with(original, Map.of(
                     "age",
                     "二十六")
+            );
+        });
+    }
+
+    @Test
+    @DisplayName("異常系: プリミティブ型を null に置き換えようとした場合に例外がスローされること")
+    void testWithPrimitiveDataNullThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            RecordHelper.with(
+                    original,
+                    new HashMap<>() {{
+                        put("name", null);
+                        put("age", null);
+                        put("backgroundList", null);
+                    }}
             );
         });
     }
