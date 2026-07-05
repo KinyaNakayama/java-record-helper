@@ -1,9 +1,7 @@
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -44,9 +42,9 @@ class RecordHelperTest {
 
         User updated = RecordHelper.with(
                 original,
-                Map.of(
-                        "age", 26
-                )
+                new HashMap<>() {{
+                    put("age", 26);
+                }}
         );
 
         assertNotNull(updated);
@@ -61,11 +59,14 @@ class RecordHelperTest {
     void testWithMultipleChanges() {
         String[] newBackground = {"〇〇大学卒業"};
 
-        User updated = RecordHelper.with(original, Map.of(
-                "name", "佐藤",
-                "age", 30,
-                "backgroundList", newBackground
-        ));
+        User updated = RecordHelper.with(
+                original,
+                new HashMap<>() {{
+                    put("name", "佐藤");
+                    put("age", 30);
+                    put("backgroundList", newBackground);
+                }}
+        );
 
         assertNotNull(updated);
         assertEquals("佐藤", updated.name());
@@ -95,7 +96,12 @@ class RecordHelperTest {
     @Test
     @DisplayName("準正常系: 元のRecordがnullの場合はnullを返すこと")
     void testWithNullRecord() {
-        User updated = RecordHelper.with(null, Map.of("age", 30));
+        User updated = RecordHelper.with(
+                null,
+                new HashMap<>() {{
+                    put("age", 30);
+                }}
+        );
         assertNull(updated);
     }
 
@@ -103,16 +109,19 @@ class RecordHelperTest {
     @DisplayName("準正常系: 変更マップがnullまたは空の場合は元のインスタンスをそのまま返すこと")
     void testWithNullOrEmptyChanges() {
         assertSame(original, RecordHelper.with(original, null));
-        assertSame(original, RecordHelper.with(original, Collections.emptyMap()));
+        assertSame(original, RecordHelper.with(original, new HashMap<>()));
     }
 
     @Test
     @DisplayName("異常系: 存在しないフィールド名が渡された場合、IllegalArgumentExceptionがスローされること")
     void testWithUnknownKeyThrowsException() {
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
-            RecordHelper.with(original, Map.of(
-                    "invalidField", "値"
-            ));
+            RecordHelper.with(
+                    original,
+                    new HashMap<>() {{
+                        put("invalidField", "値");
+                    }}
+            );
         });
 
         assertTrue(exception.getMessage().contains("Contain unknown change key: invalidField"));
@@ -122,10 +131,13 @@ class RecordHelperTest {
     @DisplayName("異常系: 存在するキーと存在しないキーが混在している場合、例外が発生して処理されないこと")
     void testWithMixedKeysThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> {
-            RecordHelper.with(original, Map.of(
-                    "age", 40,
-                    "unknownKey", "値"
-            ));
+            RecordHelper.with(
+                    original,
+                    new HashMap<>() {{
+                        put("age", 40);
+                        put("unknownKey", "値");
+                    }}
+            );
         });
     }
 
@@ -133,9 +145,11 @@ class RecordHelperTest {
     @DisplayName("異常系: キーは一致しているが、データ型が不一致の場合に例外がスローされること")
     void testWithMismatchedDataTypeThrowsException() {
         assertThrows(IllegalArgumentException.class, () -> {
-            RecordHelper.with(original, Map.of(
-                    "age",
-                    "二十六")
+            RecordHelper.with(
+                    original,
+                    new HashMap<>() {{
+                        put("age", "二十六");
+                    }}
             );
         });
     }

@@ -2,7 +2,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.RecordComponent;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.HashMap;
 
 public class RecordHelper {
 
@@ -12,7 +12,7 @@ public class RecordHelper {
     @SuppressWarnings("unchecked")
     public static <T extends Record> T with(
             T record,
-            Map<String, Object> changes
+            HashMap<String, Object> changes
     ) {
         if (record == null) {
             return null;
